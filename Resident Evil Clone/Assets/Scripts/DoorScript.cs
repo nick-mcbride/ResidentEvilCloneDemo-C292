@@ -1,33 +1,35 @@
-using System.Collections;
 using UnityEngine;
+using System.Collections;
 
 public class DoorController : MonoBehaviour
 {
     public Transform doorTransform;
-    public Vector3 openPosition;
-    public Vector3 closedPosition;
+    public Vector3 openRotation;
+    public Vector3 closedRotation;
     public float openSpeed = 2.0f;
     private bool isOpen = false;
 
     void Start()
     {
-        doorTransform.position = closedPosition;
+        doorTransform.localEulerAngles = closedRotation;
     }
 
     public void ToggleDoor()
     {
         isOpen = !isOpen;
         StopAllCoroutines();
-        StartCoroutine(MoveDoor(isOpen ? openPosition : closedPosition));
+        StartCoroutine(RotateDoor(isOpen ? openRotation : closedRotation));
     }
 
-    private IEnumerator MoveDoor(Vector3 targetPosition)
+    private IEnumerator RotateDoor(Vector3 targetRotation)
     {
-        while (Vector3.Distance(doorTransform.position, targetPosition) > 0.01f)
+        Quaternion targetQuaternion = Quaternion.Euler(targetRotation);
+        while (Quaternion.Angle(doorTransform.localRotation, targetQuaternion) > 0.01f)
         {
-            doorTransform.position = Vector3.MoveTowards(doorTransform.position, targetPosition, openSpeed * Time.deltaTime);
+            doorTransform.localRotation = Quaternion.RotateTowards(doorTransform.localRotation, targetQuaternion, openSpeed * Time.deltaTime * 100);
             yield return null;
         }
-        doorTransform.position = targetPosition;
+        doorTransform.localRotation = targetQuaternion;
     }
 }
+
