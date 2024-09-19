@@ -104,6 +104,11 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2942780403347462558, guid: 05e2e2643c790bd4285103d4e6e3cbb9,
+        type: 3}
+      propertyPath: doorController
+      value: 
+      objectReference: {fileID: 8634749055416728633}
     - target: {fileID: 5664446723102402692, guid: 05e2e2643c790bd4285103d4e6e3cbb9,
         type: 3}
       propertyPath: m_Name
@@ -259,8 +264,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   doorTransform: {fileID: 1868626596707215309}
-  openPosition: {x: 0, y: 90, z: 0}
-  closedPosition: {x: 0, y: 0, z: 0}
+  openRotation: {x: 0, y: 90, z: 0}
+  closedRotation: {x: 0, y: 0, z: 0}
   openSpeed: 2
 --- !u!4 &8008326048538948055 stripped
 Transform:

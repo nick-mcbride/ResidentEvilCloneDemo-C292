@@ -19,4 +19,3 @@ public class ButtonController : MonoBehaviour
         }
     }
 }
-

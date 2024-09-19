@@ -32,4 +32,3 @@ public class DoorController : MonoBehaviour
         doorTransform.localRotation = targetQuaternion;
     }
 }
-

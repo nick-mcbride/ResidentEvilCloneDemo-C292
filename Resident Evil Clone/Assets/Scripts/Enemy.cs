@@ -5,7 +5,7 @@ using UnityEngine.AI;
 
 public class Enemy : MonoBehaviour
 {
-    [SerializeField] private Transform target;
+    [SerializeField] private Transform Player;
     [SerializeField] private NavMeshAgent agent;
     [SerializeField] private float moveSpeed = 5f;
     [SerializeField] private float MaxHealth = 5f;
@@ -23,7 +23,7 @@ public class Enemy : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        agent.SetDestination(target.position);
+        agent.SetDestination(Player.position);
     }
 
 
