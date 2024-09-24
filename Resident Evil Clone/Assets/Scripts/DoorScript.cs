@@ -3,7 +3,7 @@ using System.Collections;
 
 public class DoorController : MonoBehaviour
 {
-    public Transform doorTransform;
+    public Transform Door;
     public Vector3 openRotation;
     public Vector3 closedRotation;
     public float openSpeed = 2.0f;
@@ -11,12 +11,18 @@ public class DoorController : MonoBehaviour
 
     void Start()
     {
-        doorTransform.localEulerAngles = closedRotation;
+        if (Door == null)
+        {
+            Debug.LogError("Door Transform is not assigned. Please assign it in the Inspector.");
+            return;
+        }
+        Door.localEulerAngles = closedRotation;
     }
 
     public void ToggleDoor()
     {
         isOpen = !isOpen;
+        Debug.Log("Toggling door. New state: " + (isOpen ? "Open" : "Closed"));
         StopAllCoroutines();
         StartCoroutine(RotateDoor(isOpen ? openRotation : closedRotation));
     }
@@ -24,11 +30,13 @@ public class DoorController : MonoBehaviour
     private IEnumerator RotateDoor(Vector3 targetRotation)
     {
         Quaternion targetQuaternion = Quaternion.Euler(targetRotation);
-        while (Quaternion.Angle(doorTransform.localRotation, targetQuaternion) > 0.01f)
+        Debug.Log("Starting door rotation to: " + targetRotation);
+        while (Quaternion.Angle(Door.localRotation, targetQuaternion) > 0.01f)
         {
-            doorTransform.localRotation = Quaternion.RotateTowards(doorTransform.localRotation, targetQuaternion, openSpeed * Time.deltaTime * 100);
+            Door.localRotation = Quaternion.RotateTowards(Door.localRotation, targetQuaternion, openSpeed * Time.deltaTime * 100);
             yield return null;
         }
-        doorTransform.localRotation = targetQuaternion;
+        Door.localRotation = targetQuaternion;
+        Debug.Log("Door rotation complete.");
     }
 }
