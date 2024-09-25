@@ -38,22 +38,24 @@ public abstract class Weapon : MonoBehaviour
 
     protected virtual void Fire()
     {
-        if (!canFire || currentLoadedAmmo <= 0)
+        if (canFire && currentLoadedAmmo > 0)
         {
-            Debug.Log("Cannot fire: No ammo loaded.");
-            return;
-        }
-
-        currentLoadedAmmo--;
-        canFire = currentLoadedAmmo > 0;
-
-        RaycastHit hit;
-        if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, 100))
-        {
-            Debug.Log(hit.transform.name);
-            if (hit.transform.CompareTag("Zombie"))
+            //debug.log("firing weapon");
+            currentLoadedAmmo--;
+            RaycastHit hit;
+            //debug.log("raycasting firing");
+            if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, 100))
             {
-                hit.transform.GetComponent<Enemy>().TakeDamage(1);
+                Debug.DrawRay(firePoint.position, firePoint.forward * hit.distance, Color.red, 2f);
+                if (hit.transform.CompareTag("Zombie"))
+                {
+                    hit.transform.GetComponent<Enemy>().TakeDamage(1);
+                }
+            }
+            else
+            {
+                //debug.log("no hit");
+                Debug.DrawRay(firePoint.position, firePoint.forward * 100, Color.red, 2f);
             }
         }
     }
