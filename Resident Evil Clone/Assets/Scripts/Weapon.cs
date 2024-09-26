@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public abstract class Weapon : MonoBehaviour
 {
@@ -10,10 +11,16 @@ public abstract class Weapon : MonoBehaviour
     [SerializeField] protected bool canFire;
     [SerializeField] protected Transform firePoint;
 
+    [SerializeField] protected Magazine magazine;
+
+    [SerializeField] public Enums.MagazineType magazineType;
+
+    private GameObject ammoText;
+
     // Start is called before the first frame update
     void Start()
     {
-        canFire = currentLoadedAmmo > 0;
+        ammoText = GameObject.FindWithTag("AmmoText");
     }
 
     // Update is called once per frame
@@ -22,46 +29,51 @@ public abstract class Weapon : MonoBehaviour
 
     }
 
-    protected virtual void Reload()
+    public virtual void Reload(Magizine newMage)
     {
-        if (currentLoadedAmmo >= ammoCapacity || currentSpareAmmo <= 0)
-        {
-            return;
-        }
+        magazine = newMag;
 
-        int ammoNeeded = ammoCapacity - currentLoadedAmmo;
-        int ammoToReload = Mathf.Min(ammoNeeded, currentSpareAmmo);
+        //if (currentLoadedAmmo >= ammoCapacity || currentSpareAmmo <= 0)
+        //{
+        //    return;
+        //}
 
-        currentLoadedAmmo += ammoToReload;
-        currentSpareAmmo -= ammoToReload;
+        //int ammoNeeded = ammoCapacity - currentLoadedAmmo;
+        //int ammoToReload = Mathf.Min(ammoNeeded, currentSpareAmmo);
+
+        //currentLoadedAmmo += ammoToReload;
+        //currentSpareAmmo -= ammoToReload;
+
     }
-
-    protected virtual void Fire()
+    public virtual void CheckAmmo()
     {
-        if (canFire && currentLoadedAmmo > 0)
+        if (magazine != null)
         {
-            //debug.log("firing weapon");
-            currentLoadedAmmo--;
-            RaycastHit hit;
-            //debug.log("raycasting firing");
-            if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, 100))
+            return magazine.GetRounds();
+        }
+        else
+        {
+            return 0;
+        }
+    }
+    public virtual void Fire()
+    {
+        if (magazine != null)
+        {
+            if (magizine.GetRounds() > 0)
             {
-                Debug.DrawRay(firePoint.position, firePoint.forward * hit.distance, Color.red, 2f);
-                if (hit.transform.CompareTag("Zombie"))
+                magazine.RemoveRound();
+                ammoText.GameObject<TextMeshObject>().text = "Ammo: " + CheckAmmo();
+                RaycastHit hit;
+                if (Physics.RayCast(firePoint.position, firePoint.forward, out hit, 100))
                 {
-                    hit.transform.GetComponent<Enemy>().TakeDamage(1);
+                    Debug.DrawRay(firePoint.position, firePoint.forward * hit.distance, Color.red, 2f);
+                    if (hit.transform.CompareTag("Zombie"))
+                    {
+                        hit.transform.GetComponent<Enemy>().TakeDamage(1);
+                    }
                 }
             }
-            else
-            {
-                //debug.log("no hit");
-                Debug.DrawRay(firePoint.position, firePoint.forward * 100, Color.red, 2f);
-            }
         }
-    }
-
-    public void TryFire()
-    {
-        Fire();
     }
 }
