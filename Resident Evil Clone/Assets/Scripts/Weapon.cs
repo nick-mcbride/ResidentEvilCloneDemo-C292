@@ -15,12 +15,12 @@ public abstract class Weapon : MonoBehaviour
 
     [SerializeField] public Enums.MagazineType magazineType;
 
-    private GameObject ammoText;
+    private TextMeshProUGUI ammoText;
 
     // Start is called before the first frame update
     void Start()
     {
-        ammoText = GameObject.FindWithTag("AmmoText");
+        ammoText = GameObject.FindWithTag("AmmoText")?.GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
@@ -29,7 +29,7 @@ public abstract class Weapon : MonoBehaviour
 
     }
 
-    public virtual void Reload(Magizine newMage)
+    public virtual void Reload(Magazine newMag)
     {
         magazine = newMag;
 
@@ -45,7 +45,8 @@ public abstract class Weapon : MonoBehaviour
         //currentSpareAmmo -= ammoToReload;
 
     }
-    public virtual void CheckAmmo()
+
+    public virtual int CheckAmmo()
     {
         if (magazine != null)
         {
@@ -56,16 +57,20 @@ public abstract class Weapon : MonoBehaviour
             return 0;
         }
     }
+
     public virtual void Fire()
     {
         if (magazine != null)
         {
-            if (magizine.GetRounds() > 0)
+            if (magazine.GetRounds() > 0)
             {
                 magazine.RemoveRound();
-                ammoText.GameObject<TextMeshObject>().text = "Ammo: " + CheckAmmo();
+                if (ammoText != null)
+                {
+                    ammoText.text = "Ammo: " + CheckAmmo();
+                }
                 RaycastHit hit;
-                if (Physics.RayCast(firePoint.position, firePoint.forward, out hit, 100))
+                if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, 100))
                 {
                     Debug.DrawRay(firePoint.position, firePoint.forward * hit.distance, Color.red, 2f);
                     if (hit.transform.CompareTag("Zombie"))

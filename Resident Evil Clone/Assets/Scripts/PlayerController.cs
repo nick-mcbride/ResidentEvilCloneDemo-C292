@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TMPPro;
+using TMPro;
 
 public class PlayerController : MonoBehaviour
 {
@@ -12,12 +12,15 @@ public class PlayerController : MonoBehaviour
     private bool isGrounded = true;
     private float xRotation;
 
+    [SerializeField] Transform fpsCamera;
     [SerializeField] Transform firePoint;
+
     private Rigidbody rb;
 
-    [SerializeField] private Weapon currentWeapon;
-    private List<IPickupable> imventory = new List<IPickupable>();
-    [SerializeField] TextMeshProGUI ammoText;
+    [SerializeField] Weapon currentWeapon;
+    private List<IPickupable> inventory = new List<IPickupable>();
+    [SerializeField] TextMeshProUGUI ammoText;
+    [SerializeField] Magazine magazine;
 
     // Start is called before the first frame update
     void Start()
@@ -29,7 +32,7 @@ public class PlayerController : MonoBehaviour
 
         if (currentWeapon != null)
         {
-            ammoText.text = "Ammo: " + currentWeapon.CheckAmmo();
+            ammoText.text = "Ammo: " + currentWeapon.CheckAmmo().ToString();
         }
     }
 
@@ -37,7 +40,6 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         lookAround();
-
         movePlayer();
 
         if (Input.GetButtonDown("Jump") && isGrounded)
@@ -92,7 +94,7 @@ public class PlayerController : MonoBehaviour
         {
             isGrounded = true;
         }
-        else if (collision.gameObject.GetComponents<IPickupable>() != null)
+        else if (collision.gameObject.GetComponent<IPickupable>() != null)
         {
             inventory.Add(collision.gameObject.GetComponent<IPickupable>());
             collision.gameObject.GetComponent<IPickupable>().Pickup(this);
@@ -106,15 +108,16 @@ public class PlayerController : MonoBehaviour
             isGrounded = false;
         }
     }
+
     private void Shoot()
     {
         if (magazine != null)
         {
-            if (magizine.GetRounds() > 0)
+            if (magazine.GetRounds() > 0)
             {
                 magazine.RemoveRound();
                 RaycastHit hit;
-                if (Physics.RayCast(firePoint.position, firePoint.forward, out hit, 100))
+                if (Physics.Raycast(firePoint.position, firePoint.forward, out hit, 100))
                 {
                     Debug.DrawRay(firePoint.position, firePoint.forward * hit.distance, Color.red, 2f);
                     if (hit.transform.CompareTag("Zombie"))
@@ -125,19 +128,21 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
     private void AttemptReload()
     {
         if (currentWeapon != null)
         {
             Enums.MagazineType gunMagType = currentWeapon.magazineType;
-            foreach (Magazine item in inventory)
+            foreach (IPickupable item in inventory)
             {
-                if (item is Magazine)
+                if (item is Magazine mag)
                 {
-                    if (item.GetMagType() == gunMagType)
+                    if (mag.GetMagType() == gunMagType)
                     {
-                        currentWeapon.Reload(item);
+                        currentWeapon.Reload(mag);
                         inventory.Remove(item);
+                        ammoText.text = "Ammo: " + currentWeapon.CheckAmmo().ToString();
                     }
                 }
             }
